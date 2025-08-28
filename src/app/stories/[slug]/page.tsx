@@ -7,7 +7,7 @@ import { prisma } from '@/lib/prisma'
 interface StoryPageProps {
   params: Promise<{
     slug: string
-  }>
+  }> 
 }
 
 // Get story from database by slug
@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: StoryPageProps) {
   }
 
   return {
-    title: `${story.title} | Grammar Stories`,
+    title: `${story.title} | English Friend`,
     description: story.excerpt,
   }
 }
@@ -60,17 +60,17 @@ export default async function StoryPage({ params }: StoryPageProps) {
       {/* Breadcrumb */}
       <nav className="mb-8">
         <div className="flex items-center space-x-2 text-sm text-gray-600">
-          <Link href="/" className="hover:text-gray-800">Home</Link>
+          <Link href="/" className="hover:text-gray-800">홈</Link>
           <span>/</span>
-          <Link href="/stories" className="hover:text-gray-800">Stories</Link>
+          <Link href="/stories" className="hover:text-gray-800">이야기</Link>
           <span>/</span>
           <span className="text-gray-800">{story.title}</span>
         </div>
       </nav>
 
       {/* Header */}
-      <header className="mb-12">
-        <div className="flex items-center space-x-3 mb-4">
+      <header className="mb-12 text-center">
+        <div className="flex items-center justify-center space-x-3 mb-4">
           <Badge variant="secondary" className="capitalize">
             {story.figure.category}
           </Badge>
@@ -79,56 +79,66 @@ export default async function StoryPage({ params }: StoryPageProps) {
             story.difficulty <= 3 ? 'bg-yellow-100 text-yellow-800' :
             'bg-red-100 text-red-800'
           }>
-            Level {story.difficulty}
+            난이도 {story.difficulty}
           </Badge>
-          <span className="text-gray-600 text-sm">{story.readingTime} min read</span>
+          <span className="text-gray-600 text-sm">예상 {story.readingTime}분</span>
         </div>
 
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
           {story.title}
         </h1>
 
-        <div className="flex items-center space-x-4 mb-6">
-          <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-            <span className="text-lg font-bold text-gray-600">
-              {story.figure.name.charAt(0)}
-            </span>
-          </div>
+        <div className="flex justify-center items-center space-x-4">
+          <img 
+            src={story.figure.imageUrl || ''} 
+            alt={story.figure.name} 
+            className="w-12 h-12 rounded-full bg-gray-200 object-cover"
+          />
           <div>
             <p className="font-semibold text-gray-800">{story.figure.name}</p>
-            <p className="text-sm text-gray-600">{story.figure.bio}</p>
+            <p className="text-sm text-gray-600">{story.figure.nationality}</p>
           </div>
-        </div>
-
-        <div className="flex flex-wrap gap-2">
-          {story.grammarTags.map((tag, index) => (
-            <Badge key={index} variant="outline">
-              {tag}
-            </Badge>
-          ))}
         </div>
       </header>
 
+      {/* Key Grammar & Expressions */}
+      {story.grammarTags && story.grammarTags.length > 0 && (
+        <section className="mb-12 p-6 bg-gray-50 rounded-lg">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">핵심 문법 및 표현</h2>
+          <div className="flex flex-wrap gap-3">
+            {story.grammarTags.map((tag, index) => (
+              <Badge key={index} variant="default" className="text-base px-3 py-1">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Content */}
-      <div className="prose prose-lg max-w-none">
-        <div className="story-content" dangerouslySetInnerHTML={{ 
-          __html: story.content.replace(/\n\n/g, '</p><p>').replace(/^/, '<p>').replace(/$/, '</p>')
-            .replace(/## (.*?)<\/p>/g, '</p><h2>$1</h2>')
-            .replace('<p></p>', '')
-        }} />
-      </div>
+      <div 
+        className="prose prose-lg max-w-none mb-12 story-content"
+        dangerouslySetInnerHTML={{ __html: story.content.replace(/\n/g, '<br />') }}
+      />
 
       {/* Quotes */}
-      {story.quotes.map((quote) => (
-        <QuoteBox
-          key={quote.id}
-          quote={quote.text}
-          author={story.figure.name}
-          grammarPoint={quote.grammarPoint}
-          explanation={quote.explanation}
-          korean={quote.korean}
-        />
-      ))}
+      {story.quotes && story.quotes.length > 0 && (
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">주요 인용구</h2>
+          <div className="space-y-8">
+            {story.quotes.map((quote) => (
+              <QuoteBox
+                key={quote.id}
+                quote={quote.text}
+                author={story.figure.name}
+                grammarPoint={quote.grammarPoint}
+                explanation={quote.explanation}
+                korean={quote.korean}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Navigation */}
       <div className="mt-16 pt-8 border-t border-gray-200">
@@ -137,7 +147,7 @@ export default async function StoryPage({ params }: StoryPageProps) {
             href="/stories"
             className="text-blue-600 hover:text-blue-800 font-medium"
           >
-            ← Back to Stories
+            ← 이야기 목록으로
           </Link>
           
           <div className="flex space-x-4">

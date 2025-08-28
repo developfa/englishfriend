@@ -8,36 +8,27 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">GS</span>
+              <span className="text-white font-bold text-sm">EF</span>
             </div>
-            <span className="text-xl font-bold text-gray-800">Grammar Stories</span>
+            <div>
+              <span className="text-xl font-bold text-gray-800">English Friend</span>
+              <p className="text-xs text-gray-500">지식으로 배우는 영어</p>
+            </div>
           </Link>
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link 
-              href="/stories" 
+            <Link
+              href="/stories"
               className="text-gray-600 hover:text-gray-800 font-medium transition-colors"
             >
-              Stories
+              이야기 (Stories)
             </Link>
-            <Link 
-              href="/figures" 
+            <Link
+              href="/about"
               className="text-gray-600 hover:text-gray-800 font-medium transition-colors"
             >
-              Figures
-            </Link>
-            <Link 
-              href="/grammar" 
-              className="text-gray-600 hover:text-gray-800 font-medium transition-colors"
-            >
-              Grammar
-            </Link>
-            <Link 
-              href="/about" 
-              className="text-gray-600 hover:text-gray-800 font-medium transition-colors"
-            >
-              About
+              소개 (About)
             </Link>
           </nav>
 
