@@ -1,0 +1,43 @@
+name: Notion Webhook Sync
+
+on:
+  repository_dispatch:
+    types: [notion-content-updated]
+  workflow_dispatch:
+
+jobs:
+  sync-content:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Sync from Notion
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+        NOTION_STORIES_DATABASE_ID: ${{ secrets.NOTION_STORIES_DATABASE_ID }}
+        NOTION_FIGURES_DATABASE_ID: ${{ secrets.NOTION_FIGURES_DATABASE_ID }}
+      run: npm run sync:notion
+      
+    - name: Commit changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add .
+        if git diff --cached --quiet; then
+          echo "No changes detected"
+        else
+          git commit -m "🔄 Webhook: Auto-sync from Notion"
+          git push
+        fi

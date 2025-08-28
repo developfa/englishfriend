@@ -4,13 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build", 
     "start": "next start",
     "lint": "next lint",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
-    "sync:notion": "tsx src/scripts/sync-notion.ts"
+    "sync:notion": "tsx src/scripts/sync-notion.ts",
+    "deploy:content": "npm run sync:notion && git add . && git commit -m \"📝 Update content from Notion $(date)\" && git push"
   },
   "dependencies": {
     "@notionhq/client": "^2.2.15",
