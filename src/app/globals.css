@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Custom styles for grammar highlighting */
+.grammar-highlight {
+  @apply bg-yellow-100 border-b-2 border-yellow-400 cursor-pointer transition-colors;
+}
+
+.grammar-highlight:hover {
+  @apply bg-yellow-200;
+}
+
+.quote-box {
+  @apply border-l-4 border-blue-500 bg-blue-50 p-4 my-6 italic;
+}
+
+.story-content {
+  @apply prose prose-lg max-w-none;
+}
+
+.story-content h2 {
+  @apply text-2xl font-bold mt-8 mb-4 text-gray-800;
+}
+
+.story-content p {
+  @apply mb-4 leading-relaxed;
+}

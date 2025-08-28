@@ -1,0 +1,154 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Figure {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  category    String   // scientist, innovator, historical, wisdom
+  bio         String?
+  imageUrl    String?  @map("image_url")
+  birthYear   Int?     @map("birth_year")
+  deathYear   Int?     @map("death_year")
+  nationality String?
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  stories     Story[]
+  quotes      Quote[]
+  
+  @@map("figures")
+}
+
+model Story {
+  id          Int      @id @default(autoincrement())
+  notionId    String   @unique @map("notion_id")
+  title       String
+  slug        String   @unique
+  content     String   // MDX content
+  excerpt     String?
+  
+  // Metadata
+  figureId    Int      @map("figure_id")
+  difficulty  Int      @default(1) // 1-5 level
+  grammarTags String[] @map("grammar_tags")
+  readingTime Int      @default(5) @map("reading_time") // minutes
+  
+  // SEO
+  metaTitle       String?     @map("meta_title")
+  metaDescription String?     @map("meta_description")
+  
+  // Publishing
+  published       Boolean     @default(false)
+  publishedAt     DateTime?   @map("published_at")
+  
+  // Timestamps
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+  
+  // Relations
+  figure          Figure      @relation(fields: [figureId], references: [id], onDelete: Cascade)
+  quotes          Quote[]
+  userProgress    UserProgress[]
+  
+  @@map("stories")
+  @@index([figureId])
+  @@index([published])
+  @@index([difficulty])
+}
+
+model Quote {
+  id          Int      @id @default(autoincrement())
+  text        String
+  korean      String?
+  context     String?  // Context within the story
+  
+  // Grammar analysis
+  grammarPoint    String?     @map("grammar_point")
+  explanation     String?     // Grammar explanation
+  
+  // Relations
+  storyId         Int?        @map("story_id")
+  figureId        Int         @map("figure_id")
+  
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+  
+  story           Story?      @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  figure          Figure      @relation(fields: [figureId], references: [id], onDelete: Cascade)
+  
+  @@map("quotes")
+  @@index([storyId])
+  @@index([figureId])
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  email       String   @unique
+  name        String?
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  progress    UserProgress[]
+  bookmarks   Bookmark[]
+  
+  @@map("users")
+}
+
+model UserProgress {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  storyId     Int      @map("story_id")
+  
+  completed   Boolean  @default(false)
+  progress    Float    @default(0) // 0-100 percentage
+  timeSpent   Int      @default(0) @map("time_spent") // seconds
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  story       Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, storyId])
+  @@map("user_progress")
+}
+
+model Bookmark {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  storyId   Int      @map("story_id")
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, storyId])
+  @@map("bookmarks")
+}
+
+model GrammarTag {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  level       Int      @default(1) // 1-5 difficulty level
+  category    String?  // tense, modal, conditional, etc.
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  
+  @@map("grammar_tags")
+}
