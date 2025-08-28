@@ -1,5 +1,9 @@
 #!/usr/bin/env tsx
 
+import { config } from 'dotenv'
+import { join } from 'path'
+config({ path: join(process.cwd(), '.env.local') }) // Load environment variables
+
 import { PrismaClient } from '@prisma/client'
 import { notionService } from '../lib/notion'
 import { slugify } from '../lib/utils'

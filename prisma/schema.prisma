@@ -61,6 +61,7 @@ model Story {
   figure          Figure      @relation(fields: [figureId], references: [id], onDelete: Cascade)
   quotes          Quote[]
   userProgress    UserProgress[]
+  bookmarks       Bookmark[]
   
   @@map("stories")
   @@index([figureId])

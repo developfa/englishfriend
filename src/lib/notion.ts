@@ -1,12 +1,31 @@
 import { Client } from '@notionhq/client'
 
-if (!process.env.NOTION_API_KEY) {
-  throw new Error('NOTION_API_KEY is not defined in environment variables')
+// Lazy initialization to allow environment variables to be loaded first
+let notionClient: Client | null = null
+
+function getNotionClient() {
+  if (!notionClient) {
+    if (!process.env.NOTION_API_KEY) {
+      throw new Error('NOTION_API_KEY is not defined in environment variables')
+    }
+    notionClient = new Client({
+      auth: process.env.NOTION_API_KEY,
+    })
+  }
+  return notionClient
 }
 
-export const notion = new Client({
-  auth: process.env.NOTION_API_KEY,
-})
+export const notion = {
+  get databases() {
+    return getNotionClient().databases
+  },
+  get blocks() {
+    return getNotionClient().blocks
+  },
+  get pages() {
+    return getNotionClient().pages
+  }
+}
 
 // Types for Notion API responses
 export interface NotionPage {
