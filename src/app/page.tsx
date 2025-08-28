@@ -1,56 +1,29 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import StoryCard from '@/components/story/StoryCard'
+import { prisma } from '@/lib/prisma'
 
-// Mock data for featured stories
+// Get featured stories from database
 async function getFeaturedStories() {
-  return [
-    {
-      id: 1,
-      title: "The Patent Clerk Who Changed Physics",
-      slug: "einstein-patent-clerk",
-      excerpt: "When Einstein was working at the patent office in Bern, he had been dreaming of unlocking the universe's secrets.",
-      difficulty: 3,
-      readingTime: 7,
-      grammarTags: ["Past Perfect", "Comparatives"],
-      published: true,
-      figure: {
-        name: "Albert Einstein",
-        category: "scientist",
-        imageUrl: null
-      }
-    },
-    {
-      id: 2,
-      title: "From Garage to Empire",
-      slug: "jobs-garage-empire", 
-      excerpt: "Steve Jobs and Steve Wozniak started Apple in a garage. This story explores how two college dropouts revolutionized personal computing.",
-      difficulty: 2,
-      readingTime: 5,
-      grammarTags: ["Past Simple", "Present Perfect"],
-      published: true,
-      figure: {
-        name: "Steve Jobs",
-        category: "innovator",
-        imageUrl: null
-      }
-    },
-    {
-      id: 3,
-      title: "Light in the Darkness",
-      slug: "helen-keller-light-darkness",
-      excerpt: "Helen Keller lost her sight and hearing at 19 months old, but she never lost her spirit.",
-      difficulty: 4,
-      readingTime: 8,
-      grammarTags: ["Past Perfect", "Passive Voice"],
-      published: true,
-      figure: {
-        name: "Helen Keller",
-        category: "historical",
-        imageUrl: null
-      }
-    }
-  ]
+  try {
+    const stories = await prisma.story.findMany({
+      where: {
+        published: true
+      },
+      include: {
+        figure: true
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      take: 3
+    })
+    
+    return stories
+  } catch (error) {
+    console.error('Error fetching featured stories:', error)
+    return []
+  }
 }
 
 export default async function Home() {

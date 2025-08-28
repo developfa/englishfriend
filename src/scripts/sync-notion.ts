@@ -150,7 +150,7 @@ class NotionSyncService {
   }
 
   async syncStory(notionPage: NotionStoryPage) {
-    const title = notionService.extractProperty(notionPage, 'Title') || 'Untitled'
+    const title = notionService.extractProperty(notionPage, 'Title') || notionService.extractProperty(notionPage, 'Name') || 'Untitled'
     const slug = slugify(title)
     const figureName = notionService.extractProperty(notionPage, 'Figure')
     const difficulty = notionService.extractProperty(notionPage, 'Difficulty') || 1

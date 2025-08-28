@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/Badge'
 import QuoteBox from '@/components/story/QuoteBox'
+import { prisma } from '@/lib/prisma'
 
 interface StoryPageProps {
   params: Promise<{
@@ -9,58 +10,25 @@ interface StoryPageProps {
   }>
 }
 
-// This would typically query your database
+// Get story from database by slug
 async function getStory(slug: string) {
-  // Mock data for demonstration
-  const stories = {
-    'einstein-patent-clerk': {
-      id: 1,
-      title: "The Patent Clerk Who Changed Physics",
-      slug: "einstein-patent-clerk",
-      content: `When Einstein was working at the patent office in Bern, he had been dreaming of unlocking the universe's secrets for years. By day, he examined mechanical inventions, but by night, his mind wandered to the fundamental nature of reality.
-
-## The Breakthrough Moment
-
-As he was riding the tram one morning in 1905, Einstein suddenly realized something profound. Time might not be absolute as Newton had claimed. This insight would revolutionize our understanding of the universe.
-
-The young physicist had already published several papers, but none as groundbreaking as what he was about to unleash upon the scientific world.
-
-## The Miracle Year
-
-By 1905, Einstein had published four papers that would forever change physics. Each paper tackled a different aspect of reality: the photoelectric effect, Brownian motion, special relativity, and mass-energy equivalence.
-
-His famous equation E=mc² showed that mass and energy are interchangeable - a concept so radical that even Einstein initially struggled to believe its implications.`,
-      excerpt: "When Einstein was working at the patent office in Bern, he had been dreaming of unlocking the universe's secrets.",
-      difficulty: 3,
-      readingTime: 7,
-      grammarTags: ["Past Perfect", "Past Continuous", "Present Perfect", "Passive Voice"],
-      published: true,
-      figure: {
-        name: "Albert Einstein",
-        category: "scientist",
-        bio: "German-born theoretical physicist widely acknowledged to be one of the greatest physicists of all time.",
-        imageUrl: null
+  try {
+    const story = await prisma.story.findUnique({
+      where: { 
+        slug: slug,
+        published: true 
       },
-      quotes: [
-        {
-          id: 1,
-          text: "Imagination is more important than knowledge",
-          korean: "상상력이 지식보다 더 중요하다",
-          grammarPoint: "Comparative",
-          explanation: "This quote uses the comparative structure 'more + adjective + than' to compare two abstract nouns. Note how 'important' becomes 'more important' when comparing."
-        },
-        {
-          id: 2, 
-          text: "The important thing is not to stop questioning",
-          korean: "중요한 것은 질문을 멈추지 않는 것이다",
-          grammarPoint: "Infinitive Subject",
-          explanation: "Here we see 'The important thing is + infinitive' structure. The infinitive phrase 'not to stop questioning' acts as the subject complement."
-        }
-      ]
-    }
+      include: {
+        figure: true,
+        quotes: true
+      }
+    })
+    
+    return story
+  } catch (error) {
+    console.error('Error fetching story:', error)
+    return null
   }
-
-  return stories[slug as keyof typeof stories] || null
 }
 
 export async function generateMetadata({ params }: StoryPageProps) {
