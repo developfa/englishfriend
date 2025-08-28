@@ -4,9 +4,9 @@ import { Badge } from '@/components/ui/Badge'
 import QuoteBox from '@/components/story/QuoteBox'
 
 interface StoryPageProps {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 // This would typically query your database
@@ -64,7 +64,8 @@ His famous equation E=mc² showed that mass and energy are interchangeable - a c
 }
 
 export async function generateMetadata({ params }: StoryPageProps) {
-  const story = await getStory(params.slug)
+  const { slug } = await params
+  const story = await getStory(slug)
   
   if (!story) {
     return {
@@ -79,7 +80,8 @@ export async function generateMetadata({ params }: StoryPageProps) {
 }
 
 export default async function StoryPage({ params }: StoryPageProps) {
-  const story = await getStory(params.slug)
+  const { slug } = await params
+  const story = await getStory(slug)
 
   if (!story) {
     notFound()
