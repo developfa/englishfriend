@@ -64,10 +64,13 @@ class NotionSyncService {
     }
 
     try {
-      const pages = await notionService.getDatabasePages(this.FIGURES_DATABASE_ID) as NotionFigurePage[]
-      console.log(`Found ${pages.length} figure pages in Notion`)
+      const pages = await notionService.getDatabasePages(this.FIGURES_DATABASE_ID)
+      const figurePages = pages.filter((page): page is NotionFigurePage => 
+        'properties' in page && page.properties !== undefined
+      )
+      console.log(`Found ${figurePages.length} figure pages in Notion`)
 
-      for (const page of pages) {
+      for (const page of figurePages) {
         await this.syncFigure(page)
       }
 
@@ -129,10 +132,13 @@ class NotionSyncService {
     }
 
     try {
-      const pages = await notionService.getDatabasePages(this.STORIES_DATABASE_ID) as NotionStoryPage[]
-      console.log(`Found ${pages.length} story pages in Notion`)
+      const pages = await notionService.getDatabasePages(this.STORIES_DATABASE_ID)
+      const storyPages = pages.filter((page): page is NotionStoryPage => 
+        'properties' in page && page.properties !== undefined
+      )
+      console.log(`Found ${storyPages.length} story pages in Notion`)
 
-      for (const page of pages) {
+      for (const page of storyPages) {
         await this.syncStory(page)
       }
 
